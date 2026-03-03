@@ -1,26 +1,254 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ═══════════════════════════════════════════
+   HabiTrack AI – Ultra-Premium Islamic Theme
+   Deep forest greens, soft cream, rich golds
+   ═══════════════════════════════════════════ */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.75rem;
+  /* Very soft cream background */
+  --background: oklch(0.99 0.005 85);
+  --foreground: oklch(0.18 0.02 260);
+  /* Cards: Pure white with soft shadow */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 260);
+  /* Primary: Deep rich emerald/forest green */
+  --primary: oklch(0.42 0.09 150);
+  --primary-foreground: oklch(0.99 0.005 145);
+  /* Secondary: Soft beige/cream */
+  --secondary: oklch(0.96 0.01 80);
+  --secondary-foreground: oklch(0.3 0.02 260);
+  --muted: oklch(0.96 0.01 80);
+  --muted-foreground: oklch(0.5 0.02 260);
+  --accent: oklch(0.95 0.01 80);
+  --accent-foreground: oklch(0.18 0.02 260);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.01 80);
+  --input: oklch(0.92 0.01 80);
+  --ring: oklch(0.42 0.09 150);
+
+  /* Sidebar: Ultra-dark rich green */
+  --sidebar: oklch(0.2 0.05 155);
+  --sidebar-foreground: oklch(0.98 0.005 85);
+  --sidebar-primary: oklch(0.5 0.12 150);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.25 0.05 155);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.25 0.05 155);
+  --sidebar-ring: oklch(0.5 0.12 150);
+
+  /* Charts */
+  --chart-1: oklch(0.5 0.12 150);
+  --chart-2: oklch(0.65 0.1 80);
+  --chart-3: oklch(0.45 0.08 260);
+  --chart-4: oklch(0.7 0.12 55);
+  --chart-5: oklch(0.6 0.15 30);
+}
+
+.dark {
+  --background: oklch(0.12 0.01 260);
+  --foreground: oklch(0.95 0.005 85);
+  --card: oklch(0.15 0.01 260);
+  --card-foreground: oklch(0.95 0.005 85);
+  --popover: oklch(0.15 0.01 260);
+  --popover-foreground: oklch(0.95 0.005 85);
+  --primary: oklch(0.5 0.12 150);
+  --primary-foreground: oklch(0.12 0.01 260);
+  --secondary: oklch(0.2 0.01 260);
+  --secondary-foreground: oklch(0.95 0.005 85);
+  --muted: oklch(0.2 0.01 260);
+  --muted-foreground: oklch(0.6 0.01 260);
+  --accent: oklch(0.2 0.01 260);
+  --accent-foreground: oklch(0.95 0.005 85);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.25 0.01 260);
+  --input: oklch(0.25 0.01 260);
+  --ring: oklch(0.5 0.12 150);
+
+  --sidebar: oklch(0.12 0.01 260);
+  --sidebar-foreground: oklch(0.95 0.005 85);
+  --sidebar-primary: oklch(0.5 0.12 150);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.2 0.01 260);
+  --sidebar-accent-foreground: oklch(0.95 0.005 85);
+  --sidebar-border: oklch(0.2 0.01 260);
+  --sidebar-ring: oklch(0.5 0.12 150);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom Scrollbar - Refined */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.7 0.02 260 / 20%);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.5 0.02 260 / 40%);
   }
 }
 
-body {
-  background: var(--background);
+/* ═══════════════════════════════════════════
+   Premium Custom Utilities
+   ═══════════════════════════════════════════ */
+
+/* Text Gradients */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #d4a853, #a37f2a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.emerald-gradient-text {
+  background: linear-gradient(135deg, oklch(0.5 0.12 150), oklch(0.35 0.08 150));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass & Container Effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+}
+
+.dark .glass-panel {
+  background: rgba(30, 30, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Islamic Geometric Pattern */
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.83-1.66 1.66-.83-.83.83-.83zM0 54.627l.83.83-1.66 1.66-.83-.83.83-.83zM58.784 0l.829.83-1.659 1.66-.829-.83.829-.83zM0 58.784l.829.83-1.659 1.66-.829-.83.829-.83zM28.343 0l6.627 6.627-1.659 1.66-6.627-6.628 1.659-1.659zM0 28.343l6.627 6.627-1.66 1.659-6.627-6.627 1.66-1.659zM58.343 30l1.657 1.657-6.628 6.627-1.659-1.659 6.63-6.625zM30 58.343l1.657 1.657-6.627 6.627-1.659-1.659 6.629-6.625zM30 2v6.627H2v-6.627h28zm-2.343 2.343H4.343v1.942h23.314v-1.942zm-5.94 10.74l6.626-6.628 1.66 1.66-6.628 6.626-1.658-1.658zm-19.143 0l6.627-6.628 1.659 1.66-6.627 6.626-1.659-1.658zm28.71 19.141l1.66-1.658 6.627 6.627-1.661 1.659-6.626-6.628zm-30 0l1.66-1.658 6.627 6.627-1.66 1.659-6.627-6.628zM30 60V32h28v28H30zm2.343-2.343v-23.314h23.314v23.314H32.343zm5.94-10.741l-6.626-6.628-1.66 1.66 6.628 6.626 1.658-1.658zm19.143 0l-6.627-6.628-1.659 1.66 6.627 6.626 1.659-1.658zm-28.71-19.143l-1.66-1.658-6.627 6.627 1.66 1.659 6.627-6.628zm30 0l-1.66-1.658-6.627 6.627 1.66 1.659 6.627-6.628z' fill='currentColor' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+/* Animations */
+.animate-ring-fill {
+  animation: ring-fill 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: 283;
+  }
+}
+
+.premium-shadow {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+}
+
+.dark .premium-shadow {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* Prose for AI Chat Markdown */
+.prose-chat h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+.prose-chat h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 0.8rem;
+  margin-bottom: 0.4rem;
+  color: var(--foreground);
+}
+
+.prose-chat p {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+.prose-chat ul {
+  border-left: 2px solid oklch(0.5 0.12 150 / 0.2);
+  padding-left: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-chat li {
+  margin-bottom: 0.25rem;
+}
+
+.prose-chat strong {
+  color: oklch(0.42 0.09 150);
+  font-weight: 600;
+}
+
+.dark .prose-chat strong {
+  color: oklch(0.5 0.12 150);
 }
