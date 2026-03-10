@@ -8,7 +8,7 @@ A production-ready, SaaS-style platform for managing spiritual mentorship relati
 
 ## ✨ Features
 
-- **Role-Based System** – Admin, Murabbi (Mentor), Salik (Student) with strict RBAC
+- **Role-Based System** – Admin, Murabbi (Mentor), Salik (Student) with RBAC
 - **Daily Report Tracking** – Dynamic task templates with completion tracking
 - **Performance Analytics** – Charts, streaks, 40-day rolling averages, performance rings
 - **AI Spiritual Guide** – GROQ-powered chatbot for guidance and habit advice
@@ -130,7 +130,7 @@ src/
 - **Charts**: Recharts with gradient fills
 - **Typography**: Geist Sans & Mono
 
-## 📦 Deployment
+## 📦 Deployment 
 
 Deploy to Vercel:
 
