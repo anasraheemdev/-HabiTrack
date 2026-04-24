@@ -3,7 +3,15 @@
 // ════════════════════════════════════════════════════════════
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { assignmentSchema } from '@/lib/validations';
+
+// Service role client to bypass any RLS row check limitations during re-assignments
+const adminSupabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+);
 
 export async function POST(request: NextRequest) {
     try {
@@ -28,31 +36,43 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: result.error.issues[0].message }, { status: 400 });
         }
 
-        // Deactivate existing assignment
-        await supabase
+        const { salik_id, murabbi_id } = result.data;
+
+        // 1. Deactivate ALL existing active assignments for this salik to prevent double-mapping
+        const { error: updErr } = await adminSupabase
             .from('salik_murabbi_map')
             .update({ is_active: false })
-            .eq('salik_id', result.data.salik_id)
+            .eq('salik_id', salik_id)
             .eq('is_active', true);
 
-        // Create new assignment
-        const { data, error } = await supabase
+        if (updErr) {
+            console.error('Failed to deactivate old assignments:', updErr);
+            throw new Error('Failed to deactivate old maps');
+        }
+
+        // 2. UPSERT new assignment (handles cases where they return to a previous murabbi violating UNIQUE)
+        const { data, error } = await adminSupabase
             .from('salik_murabbi_map')
-            .insert({
-                salik_id: result.data.salik_id,
-                murabbi_id: result.data.murabbi_id,
+            .upsert({
+                salik_id,
+                murabbi_id,
                 is_active: true,
+            }, {
+                onConflict: 'salik_id,murabbi_id',
             })
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Reassignment insert/upd error:', error);
+            throw error;
+        }
 
-        // Log activity
-        await supabase.from('activity_logs').insert({
+        // 3. Log activity
+        await adminSupabase.from('activity_logs').insert({
             user_id: user.id,
             action: 'reassigned salik',
-            details: `Salik ${result.data.salik_id} assigned to Murabbi ${result.data.murabbi_id}`,
+            details: `Salik ${salik_id} assigned to Murabbi ${murabbi_id}`,
         });
 
         return NextResponse.json({ assignment: data }, { status: 201 });

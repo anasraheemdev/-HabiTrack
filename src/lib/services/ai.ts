@@ -67,6 +67,45 @@ TONE: Collegial, professional, practical. Speak to the Murrabi as a capable ment
 ` + COMMON_FORMATTING_RULES;
 
 
+// Lazy-load Xenova Transformers pipeline for offline Embeddings (No API limits!)
+let _embedder: any = null;
+async function getEmbedder() {
+    if (!_embedder) {
+        // dynamic import to avoid breaking next.js if the user hits client-side accidentally
+        const { pipeline } = await import('@xenova/transformers');
+        _embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    }
+    return _embedder;
+}
+
+/**
+ * Perform a Semantic Vector Search in Supabase RAG Database
+ */
+export async function searchKnowledgeBase(query: string, matchCount = 3) {
+    try {
+        const embedder = await getEmbedder();
+        const output = await embedder(query, { pooling: 'mean', normalize: true });
+        const queryEmbedding = Array.from(output.data);
+
+        const supabase = await createServerSupabaseClient();
+        const { data: documents, error } = await supabase.rpc('match_documents', {
+            query_embedding: queryEmbedding,
+            match_threshold: 0.1, // fairly broad threshold to catch nuances
+            match_count: matchCount
+        });
+
+        if (error) {
+            console.error('Vector Search Error:', error);
+            return [];
+        }
+
+        return documents;
+    } catch (e) {
+        console.error("Failed to construct embedding or hit RAG:", e);
+        return [];
+    }
+}
+
 export async function buildSalikContext(userId: string): Promise<string> {
     const supabase = await createServerSupabaseClient();
 

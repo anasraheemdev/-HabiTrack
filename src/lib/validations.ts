@@ -53,6 +53,15 @@ export const aiChatSchema = z.object({
     thread_id: z.string().uuid('Thread ID is required'),
 });
 
+export const taskTemplateSchema = z.object({
+    category: z.enum(['faraiz', 'nawafil', 'tasbeeh', 'tilawat', 'habit_tracking', 'prohibitions', 'study', 'sleep_tracking']),
+    task_name: z.string().min(1, 'Task name is required').max(100),
+    description: z.string().max(500).optional().nullable(),
+    has_numeric_input: z.boolean().optional().default(false),
+    numeric_label: z.string().optional().nullable(),
+    weight: z.number().min(0.1).max(10).optional().default(1.0),
+});
+
 export const assignmentSchema = z.object({
     salik_id: z.string().uuid(),
     murabbi_id: z.string().uuid(),
@@ -65,3 +74,4 @@ export type HabitInput = z.infer<typeof habitSchema>;
 export type DailyReportInput = z.infer<typeof dailyReportSchema>;
 export type AIChatInput = z.infer<typeof aiChatSchema>;
 export type AssignmentInput = z.infer<typeof assignmentSchema>;
+export type TaskTemplateInput = z.infer<typeof taskTemplateSchema>;

@@ -23,16 +23,14 @@ const FEATURES = [
 
 export default function SalikAIAssistantPage() {
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-4 min-h-0 h-full">
 
             {/* ── Hero Header ── */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="relative overflow-hidden rounded-2xl mb-4 flex-shrink-0
-                           bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700
-                           shadow-lg shadow-violet-900/20"
+                className="relative overflow-hidden rounded-2xl flex-shrink-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 shadow-lg shadow-violet-900/20"
             >
                 <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" />
                 <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-black/10 blur-xl pointer-events-none" />
@@ -49,7 +47,7 @@ export default function SalikAIAssistantPage() {
                                     Salik
                                 </span>
                             </h1>
-                            <p className="text-sm text-white/70 mt-0.5 leading-snug max-w-md">
+                            <p className="text-sm text-white/70 mt-0.5 leading-snug max-w-md hidden sm:block">
                                 Your personal AI spiritual companion — guidance tailored to your Chilla journey and daily amal.
                             </p>
                         </div>
@@ -59,8 +57,7 @@ export default function SalikAIAssistantPage() {
                         {FEATURES.map(f => (
                             <span
                                 key={f.label}
-                                className="flex items-center gap-1.5 text-[11px] font-medium text-white/85
-                                           bg-white/[0.12] border border-white/20 rounded-full px-3 py-1"
+                                className="flex items-center gap-1.5 text-[11px] font-medium text-white/85 bg-white/[0.12] border border-white/20 rounded-full px-3 py-1"
                             >
                                 {f.icon}
                                 {f.label}
@@ -75,10 +72,11 @@ export default function SalikAIAssistantPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.08 }}
-                className="rounded-2xl overflow-hidden shadow-sm border border-border/40 [&>div]:!h-full"
-                style={{ height: 'calc(100vh - 88px - 80px - 16px)' }}
+                className="flex-1 min-h-0 rounded-2xl overflow-hidden shadow-sm border border-border/40 flex flex-col"
             >
-                <ChatInterface role="salik" suggestions={SALIK_SUGGESTIONS} />
+                <div className="flex-1 w-full h-full relative flex min-h-0">
+                    <ChatInterface role="salik" suggestions={SALIK_SUGGESTIONS} />
+                </div>
             </motion.div>
         </div>
     );

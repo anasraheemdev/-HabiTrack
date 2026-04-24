@@ -43,3 +43,10 @@ next-env.d.ts
 
 # supabase
 /supabase/
+
+# Data and Documents
+*.pdf
+
+# Test and Scratch Scripts
+test-*.js
+read_all.js

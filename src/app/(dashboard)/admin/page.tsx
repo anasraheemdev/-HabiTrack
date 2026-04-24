@@ -43,58 +43,39 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-            // Total Saliks
-            const { count: salikCount } = await supabase
-                .from('profiles')
-                .select('id', { count: 'exact' })
-                .eq('role', 'salik');
-
-            // Total Murabbis
-            const { count: murabbiCount } = await supabase
-                .from('profiles')
-                .select('id', { count: 'exact' })
-                .eq('role', 'murabbi');
-
-            // Pending Invites
-            const { data: pendingUsers, count: pendingCount } = await supabase
-                .from('profiles')
-                .select('id, full_name, email, role, created_at', { count: 'exact' })
-                .eq('is_profile_complete', false)
-                .order('created_at', { ascending: false });
+            const today = new Date().toISOString().split('T')[0];
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            // 1. Kick off all single-value aggregate queries in parallel
+            const [
+                { count: salikCount },
+                { count: murabbiCount },
+                { data: pendingUsers, count: pendingCount },
+                { count: activeChillasCount },
+                { count: submittedToday },
+                { data: recentReports },
+                { data: logs }
+            ] = await Promise.all([
+                supabase.from('profiles').select('id', { count: 'exact' }).eq('role', 'salik'),
+                supabase.from('profiles').select('id', { count: 'exact' }).eq('role', 'murabbi'),
+                supabase.from('profiles').select('id, full_name, email, role, created_at', { count: 'exact' }).eq('is_profile_complete', false).order('created_at', { ascending: false }),
+                supabase.from('chilla_records').select('id', { count: 'exact' }).eq('is_complete', false),
+                supabase.from('daily_reports').select('id', { count: 'exact' }).eq('report_date', today),
+                supabase.from('daily_reports').select('completion_percentage').gte('report_date', thirtyDaysAgo.toISOString().split('T')[0]),
+                supabase.from('activity_logs').select('*, user:profiles(full_name)').order('created_at', { ascending: false }).limit(10)
+            ]);
 
             setPendingInviteUsers(pendingUsers || []);
-
-            // Active Chillas
-            const { count: activeChillasCount } = await supabase
-                .from('chilla_records')
-                .select('id', { count: 'exact' })
-                .eq('is_complete', false);
-
             setTotalMurabbis(murabbiCount || 0);
-
-            const today = new Date().toISOString().split('T')[0];
-
-            // Missed reports today
-            const { count: submittedToday } = await supabase
-                .from('daily_reports')
-                .select('id', { count: 'exact' })
-                .eq('report_date', today);
+            
+            if (logs) setActivities(logs as unknown as ActivityLog[]);
 
             const missedReports = (salikCount || 0) - (submittedToday || 0);
 
-            // Average performance (last 30 days)
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            const { data: recentReports } = await supabase
-                .from('daily_reports')
-                .select('completion_percentage')
-                .gte('report_date', thirtyDaysAgo.toISOString().split('T')[0]);
-
-            const avgPerf =
-                recentReports && recentReports.length > 0
-                    ? recentReports.reduce((a, b) => a + Number(b.completion_percentage), 0) /
-                    recentReports.length
-                    : 0;
+            const avgPerf = recentReports && recentReports.length > 0
+                ? recentReports.reduce((a, b) => a + Number(b.completion_percentage), 0) / recentReports.length
+                : 0;
 
             setStats({
                 totalSaliks: salikCount || 0,
@@ -104,37 +85,28 @@ export default function AdminDashboard() {
                 pendingInvites: pendingCount || 0,
             });
 
-            // Activity logs
-            const { data: logs } = await supabase
-                .from('activity_logs')
-                .select('*, user:profiles(full_name)')
-                .order('created_at', { ascending: false })
-                .limit(10);
-
-            if (logs) setActivities(logs as unknown as ActivityLog[]);
-
-            // Trend data (last 14 days)
-            const trendDays: { date: string; percentage: number }[] = [];
+            // 2. Fetch all 14-day trend days in parallel
+            const promises = [];
             for (let i = 13; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 const dateStr = d.toISOString().split('T')[0];
-                const { data: dayReports } = await supabase
-                    .from('daily_reports')
-                    .select('completion_percentage')
-                    .eq('report_date', dateStr);
-
-                const avg =
-                    dayReports && dayReports.length > 0
-                        ? dayReports.reduce((a, b) => a + Number(b.completion_percentage), 0) /
-                        dayReports.length
-                        : 0;
-
-                trendDays.push({
-                    date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    percentage: Math.round(avg),
-                });
+                const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                promises.push(
+                    supabase.from('daily_reports')
+                        .select('completion_percentage')
+                        .eq('report_date', dateStr)
+                        .then(({ data: dayReports }) => {
+                            const avg = dayReports && dayReports.length > 0
+                                ? dayReports.reduce((a, b) => a + Number(b.completion_percentage), 0) / dayReports.length
+                                : 0;
+                            return { date: displayDate, percentage: Math.round(avg) };
+                        })
+                );
             }
+            
+            const trendDays = await Promise.all(promises);
             setTrendData(trendDays);
         };
 
@@ -156,7 +128,7 @@ export default function AdminDashboard() {
                             <Avatar className="w-16 h-16 border-2 border-primary/20 shadow-xl">
                                 <AvatarImage src={profile?.avatar_url} />
                                 <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                                    {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                                    {profile?.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'AD'}
                                 </AvatarFallback>
                             </Avatar>
                             <div>

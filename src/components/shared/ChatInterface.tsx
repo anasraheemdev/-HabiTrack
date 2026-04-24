@@ -354,7 +354,7 @@ export function ChatInterface({ role, suggestions }: ChatInterfaceProps) {
     );
 
     return (
-        <div className="flex flex-col md:flex-row h-[calc(100vh-140px)] min-h-[500px] border rounded-xl overflow-hidden bg-card shadow-sm">
+        <div className="flex flex-col md:flex-row flex-1 w-full min-h-0 h-full border rounded-xl overflow-hidden bg-card shadow-sm">
 
             {/* Sidebar (Threads & Bookmarks) */}
             <div className="w-full md:w-72 border-b md:border-b-0 md:border-r bg-secondary/10 flex flex-col flex-shrink-0">

@@ -25,14 +25,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
             {/* Main Content — margin driven by same context */}
             <div
-                className="flex-1 flex flex-col min-w-0 transition-all duration-300"
-                style={{ marginLeft: collapsed ? 80 : 270 }}
+                className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${collapsed ? 'lg:ml-[80px]' : 'lg:ml-[270px]'}`}
             >
                 <div className="sticky top-0 z-30 pt-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-background/95 to-transparent pb-4">
                     <Navbar />
                 </div>
 
-                <main className="flex-1 relative z-10 p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full pt-2">
+                <main className="flex-1 flex flex-col relative z-10 p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full pt-2">
                     {children}
                 </main>
             </div>

@@ -22,14 +22,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing salikId or message' }, { status: 400 });
         }
 
-        // Verify assignment
+        // Verify assignment (used limit(1) to protect against stale multiple active roles bug)
         const { data: mapping } = await supabase
             .from('salik_murabbi_map')
             .select('id')
             .eq('murabbi_id', user.id)
             .eq('salik_id', salikId)
             .eq('is_active', true)
-            .single();
+            .limit(1)
+            .maybeSingle();
 
         if (!mapping) {
             return NextResponse.json({ error: 'Salik not assigned to you' }, { status: 403 });

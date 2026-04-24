@@ -4,7 +4,7 @@
 // ════════════════════════════════════════════════════════════
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { chatWithAI, buildSalikContext, buildMurrabiContext } from '@/lib/services/ai';
+import { chatWithAI, buildSalikContext, buildMurrabiContext, searchKnowledgeBase } from '@/lib/services/ai';
 import { aiChatSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
@@ -61,6 +61,17 @@ export async function POST(request: NextRequest) {
             contextBlock = await buildSalikContext(user.id);
         } else if (profile.role === 'murabbi') {
             contextBlock = await buildMurrabiContext(user.id);
+        }
+
+        // --- RAG INTEGRATION (The Sealed Nectar) ---
+        // We perform a semantic search using Xenova transformers against our Supabase vector store
+        const ragDocs = await searchKnowledgeBase(message, 3);
+        if (ragDocs && ragDocs.length > 0) {
+            const ragText = ragDocs.map((doc: any) => `- ${doc.content}`).join('\n\n');
+            contextBlock += `\n\n=== ISLAMIC KNOWLEDGE BASE (The Sealed Nectar) ===
+The following are highly relevant excerpts from the Seerah (life of the Prophet). If they answer the user's question or provide good contextual advice, draw upon them in your response:
+
+${ragText}\n\n`;
         }
 
         // Get AI response
