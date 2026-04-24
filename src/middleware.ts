@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ['/login', '/auth/callback'];
+const PUBLIC_ROUTES = ['/', '/login', '/auth/callback'];
 
 // Routes that all authenticated users can access
 const SHARED_ROUTES = ['/profile', '/messages'];
@@ -21,7 +21,10 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Allow public routes
-    if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+    if (PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
+        // Special case: we still want to let unauthenticated users hit exactly "/" and "/login" 
+        // without getting blocked by the user check below. If we use startWith('/') it matches EVERYTHING.
+        // So we need exact matches or specific startsWith logic.
         const { supabaseResponse } = await updateSession(request);
         return supabaseResponse;
     }
@@ -66,13 +69,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(targetDashboard, request.url));
     }
 
-    // If on root, redirect to role-specific dashboard
-    if (pathname === '/') {
-        if (role) {
-            return NextResponse.redirect(new URL(`/${role}`, request.url));
-        }
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
+    // (Root logic was removed because `/` is handled as a public route above and its own page.tsx renders appropriately.)
 
     // Check role-based access
     if (role) {
